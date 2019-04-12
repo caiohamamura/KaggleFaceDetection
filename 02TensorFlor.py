@@ -185,7 +185,7 @@ else:
                              saver=saver,
                              global_step=global_step,
                              save_model_secs=600)  
-        server_grpc_url = "grpc://" + worker_hosts[rank]
+        server_grpc_url = "grpc://" + jobs[job_name][rank]
 
         #
         with sv.prepare_or_wait_for_session(server_grpc_url,
