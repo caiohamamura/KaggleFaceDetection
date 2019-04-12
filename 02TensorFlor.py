@@ -123,9 +123,8 @@ else:
       
         #
         W_conv1 = weight_variable([5, 5, 1, 32])
-        b_conv1 = bias_variable([32]
-      
-        #
+        b_conv1 = bias_variable([32])
+        #asas
         x_image = tf.reshape(x, [-1, 28, 28, 1])
 
         #
