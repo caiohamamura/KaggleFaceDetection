@@ -196,9 +196,9 @@ else:
                 # Run a training step asynchronously.
                 batch = mnist.train.next_batch(batch_size)
                 if step % 10 == 0:
-                train_accuracy = accuracy.eval(session=sess,feed_dict={
-                    x: batch[0], y_: batch[1], keep_prob: 1.0})
-                print('step %d, training accuracy %g' % (step, train_accuracy))
+                    train_accuracy = accuracy.eval(session=sess,feed_dict={
+                        x: batch[0], y_: batch[1], keep_prob: 1.0})
+                    print('step %d, training accuracy %g' % (step, train_accuracy))
                 _, step = sess.run([train_step, global_step], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
             print('test accuracy %g' % accuracy.eval(feed_dict={
