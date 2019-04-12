@@ -178,31 +178,31 @@ else:
                 rank)
 
         #
-        sv = tf.train.Supervisor(is_chief=is_chief,
-                             logdir="train_logs",
-                             summary_op=summary_op,
-                             init_op=init_op,
-                             saver=saver,
-                             global_step=global_step,
-                             save_model_secs=600)  
-        server_grpc_url = "grpc://" + jobs[job_name][rank]
+    sv = tf.train.Supervisor(is_chief=is_chief,
+                            logdir="train_logs",
+                            summary_op=summary_op,
+                            init_op=init_op,
+                            saver=saver,
+                            global_step=global_step,
+                            save_model_secs=600)  
+    server_grpc_url = "grpc://" + jobs[job_name][rank]
 
-        #
-        with sv.prepare_or_wait_for_session(server_grpc_url,
-                                          config=sess_config) as sess:
-            step = 0
-            #If anything goes wrong, sv.should_stop() will halt execution on a worker
-            while (not sv.should_stop()) and (step < 5000):
-                # Run a training step asynchronously.
-                batch = mnist.train.next_batch(batch_size)
-                if step % 10 == 0:
-                    train_accuracy = accuracy.eval(session=sess,feed_dict={
-                        x: batch[0], y_: batch[1], keep_prob: 1.0})
-                    print('step %d, training accuracy %g' % (step, train_accuracy))
-                _, step = sess.run([train_step, global_step], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+    #
+    with sv.prepare_or_wait_for_session(server_grpc_url,
+                                        config=sess_config) as sess:
+        step = 0
+        #If anything goes wrong, sv.should_stop() will halt execution on a worker
+        while (not sv.should_stop()) and (step < 5000):
+            # Run a training step asynchronously.
+            batch = mnist.train.next_batch(batch_size)
+            if step % 10 == 0:
+                train_accuracy = accuracy.eval(session=sess,feed_dict={
+                    x: batch[0], y_: batch[1], keep_prob: 1.0})
+                print('step %d, training accuracy %g' % (step, train_accuracy))
+            _, step = sess.run([train_step, global_step], feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-            print('test accuracy %g' % accuracy.eval(feed_dict={
-                x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
-        
-        print("ALL FINISHED")
-        sv.stop()
+        print('test accuracy %g' % accuracy.eval(feed_dict={
+            x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    
+    print("ALL FINISHED")
+    sv.stop()
