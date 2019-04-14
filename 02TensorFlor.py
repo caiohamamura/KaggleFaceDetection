@@ -4,7 +4,30 @@ import socket
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-data_dir = 'data/'
+
+def load_img(path):
+    img_raw = tf.read_file(path)
+    img = tf.image.decode_jpeg(img_raw, channels=3)
+    return img
+
+def load_and_preprocess_from_path_label(path, label):
+  return load_img(path), label
+
+
+data_dir = 'data'
+
+train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1/255.)
+train_datagen.flow_from_directory()
+
+all_image_paths = list(glob('%s/%s/%s/**' % (data_dir, 'real_and_fake_face', 'training_fake')))
+label_names = [i[-8:-4] for i in all_image_paths]
+
+ds = tf.data.Dataset.from_tensor_slices((all_image_paths, label_names))
+ds = ds.map(load_and_preprocess_from_path_label)
+
+
+
+
 batch_size = 100
 comm = MPI.COMM_WORLD
 size = comm.Get_size() # qde de tarefas MPI
@@ -111,7 +134,29 @@ else:
         is_chief = rank == 1
 
 
-        x = tf.placeholder(tf.float32, [None, 784])
+        model = tf.keras.models.Sequential([
+          tf.keras.layers.Conv2D(32, (3, 3), input_shape=(600, 600, 3)),
+          tf.keras.layers.Activation('relu'),
+          tf.keras.layers.MaxPooling2D((2,2)),
+
+          tf.keras.layers.Conv2D(32, (3,3)),
+          tf.keras.layers.Activation('relu'),
+          tf.keras.layers.MaxPooling2D((2,2)),
+
+          tf.keras.layers.Conv2D(64, (3,3)),
+          tf.keras.layers.Activation('relu'),
+          tf.keras.layers.MaxPooling2D((2,2)),
+
+          tf.keras.layers.Flatten(),
+          tf.keras.layers.Dense(60),
+          tf.keras.layers.Activation('relu'),
+          tf.keras.layers.Dropout(rate=0.5),
+          tf.keras.layers.Dense(4),
+          tf.keras.layers.Activation('sigmoid')
+        ])
+        model.compile(loss='binary_crossentropy',
+              optimizer='rmsprop',
+              metrics=['accuracy'])
         y_ = tf.placeholder(tf.float32, [None, 10])
 
         mnist = input_data.read_data_sets(data_dir, one_hot=True)
