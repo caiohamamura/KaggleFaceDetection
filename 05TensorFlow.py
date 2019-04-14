@@ -6,10 +6,12 @@ import os
 import random
 from glob2 import glob
 import itertools
-from tensorflow.keras import backend as K
-import horovod.keras as hvd
-hvd.init()
-rank = str(hvd.local_rank())
+from mpi4py import MPI
+import math
+
+comm = MPI.COMM_WORLD
+size = comm.Get_size() # qde de tarefas MPI
+rank = comm.Get_rank() # identificador da tarefa (rank)
 rank = str(1)
 PARTITION_TEST = 0.25
 BATCH_SIZE = 20
@@ -30,11 +32,7 @@ def config_proto():
     config.device_count['CPU'] = 12
     config.gpu_options.visible_device_list = rank
     # For collective_all_reduce, ignore all devices except current worker.
-    if rank == 0:
-        config.device_filters.append(
-            '/job:%s/replica:0/task:%s' % ("ps", rank))
-    else:
-        config.device_filters.append(
+    config.device_filters.append(
             '/job:%s/replica:0/task:%s' % ("worker", rank))
 
     return config
@@ -130,7 +128,7 @@ model = tf.keras.models.Sequential([
 
 from tensorflow.keras import optimizers
 
-opt = optimizers.Adadelta(1.0 * hvd.size())
+opt = optimizers.Adadelta(1.0 * size)
 opt = hvd.DistributedOptimizer(opt)
 
 sgd = optimizers.SGD(lr=1, decay=.3, momentum=0.9, nesterov=True)
@@ -147,7 +145,6 @@ callbacks = [
     # Horovod: broadcast initial variable states from rank 0 to all other processes.
     # This is necessary to ensure consistent initialization of all workers when
     # training is started with random weights or restored from a checkpoint.
-    hvd.callbacks.BroadcastGlobalVariablesCallback(0)
 ]
 
 if hvd.rank() == 0:
