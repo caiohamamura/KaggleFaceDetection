@@ -143,13 +143,11 @@ model.compile(loss='binary_crossentropy',
 
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(monitor='val_acc', mode='max', min_delta=0.1, patience=10)
-mc = 
 callbacks = [
     # Horovod: broadcast initial variable states from rank 0 to all other processes.
     # This is necessary to ensure consistent initialization of all workers when
     # training is started with random weights or restored from a checkpoint.
-    hvd.callbacks.BroadcastGlobalVariablesCallback(0),
-    mc
+    hvd.callbacks.BroadcastGlobalVariablesCallback(0)
 ]
 
 if hvd.rank() == 0:

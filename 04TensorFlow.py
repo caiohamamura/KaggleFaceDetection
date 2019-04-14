@@ -8,6 +8,7 @@ import random
 from glob2 import glob
 import itertools
 
+
 PARTITION_TEST = 0.25
 BATCH_SIZE = 20
 NUM_CLASSES = 4
