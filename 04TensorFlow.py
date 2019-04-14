@@ -79,20 +79,22 @@ ds_test.prefetch(tf.contrib.data.AUTOTUNE)
     
 
 model = tf.keras.models.Sequential([
-          tf.keras.layers.Conv2D(3, (3, 3), input_shape=(600, 600, 3)),
+          tf.keras.layers.Conv2D(32, (3, 3), input_shape=(600, 600, 3)),
           tf.keras.layers.Activation('relu'),
           tf.keras.layers.MaxPooling2D((2,2)),
 
-          tf.keras.layers.Conv2D(2, (3,3)),
+          tf.keras.layers.Conv2D(32, (3,3)),
+          tf.keras.layers.Activation('relu'),
+          tf.keras.layers.MaxPooling2D((2,2)),
+
+          tf.keras.layers.Conv2D(64, (3,3)),
           tf.keras.layers.Activation('relu'),
           tf.keras.layers.MaxPooling2D((2,2)),
 
           tf.keras.layers.Flatten(),
-          tf.keras.layers.Dense(5),
+          tf.keras.layers.Dense(60),
           tf.keras.layers.Activation('relu'),
-          tf.keras.layers.Dense(5),
-          tf.keras.layers.Activation('relu'),
-        #   tf.keras.layers.Dropout(rate=0.1),
+          tf.keras.layers.Dropout(rate=0.5),
           tf.keras.layers.Dense(NUM_CLASSES),
           tf.keras.layers.Activation('sigmoid')
         ])
@@ -101,9 +103,9 @@ model = tf.keras.models.Sequential([
 import tensorflow.keras.backend as K
 from tensorflow.contrib.metrics import confusion_matrix
 from tensorflow.keras import optimizers
-sgd = optimizers.SGD(lr=.3, decay=.3, momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=1, decay=.3, momentum=0.9, nesterov=True)
 model.compile(loss='binary_crossentropy',
-        optimizer=sgd,
+        # optimizer=sgd,
         metrics=['acc'])
 
 
