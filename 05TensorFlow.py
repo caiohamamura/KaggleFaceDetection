@@ -6,7 +6,7 @@ import os
 import random
 from glob2 import glob
 import itertools
-from tf.keras import backend as K
+from tensorflow.keras import backend as K
 import horovod.keras as hvd
 hvd.init()
 rank = str(hvd.local_rank())
