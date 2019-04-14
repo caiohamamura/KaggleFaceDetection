@@ -13,7 +13,6 @@ from tensorflow.keras import optimizers
 comm = MPI.COMM_WORLD
 size = comm.Get_size() # qde de tarefas MPI
 rank = comm.Get_rank() # identificador da tarefa (rank)
-rank = str(1)
 PARTITION_TEST = 0.25
 BATCH_SIZE = 20
 NUM_CLASSES = 4
@@ -26,15 +25,16 @@ def config_proto():
     params: Params tuple, typically created by make_params or
             make_params_from_flags.
     """
+    rank_inner = str(rank)
     config = tf.ConfigProto()
     config.allow_soft_placement = True
     config.intra_op_parallelism_threads = 12
     config.experimental.collective_group_leader = '/job:worker/replica:0/task:0'
     config.device_count['CPU'] = 12
-    config.gpu_options.visible_device_list = rank
+    config.gpu_options.visible_device_list = rank_inner
     # For collective_all_reduce, ignore all devices except current worker.
     config.device_filters.append(
-            '/job:%s/replica:0/task:%s' % ("worker", rank))
+            '/job:%s/replica:0/task:%s' % ("worker", rank_inner))
 
     return config
 
