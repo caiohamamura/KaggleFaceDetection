@@ -106,6 +106,7 @@ from tensorflow.keras import optimizers
 sgd = optimizers.SGD(lr=1, decay=.3, momentum=0.9, nesterov=True)
 model.compile(loss='binary_crossentropy',
         # optimizer=sgd,
+        optimizer="rmsprop",
         metrics=['acc'])
 
 
