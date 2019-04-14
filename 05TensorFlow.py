@@ -183,12 +183,11 @@ else:
     global_step = tf.Variable(0, name='global_step', trainable=False)
 
     opt = optimizers.Adadelta(1.0 * size)
-    opt = hvd.DistributedOptimizer(opt)
 
     sgd = optimizers.SGD(lr=1, decay=.3, momentum=0.9, nesterov=True)
     model.compile(loss='binary_crossentropy',
             # optimizer=sgd,
-            optimizer="rmsprop",
+            optimizer=opt,
             metrics=['acc'])
 
 
