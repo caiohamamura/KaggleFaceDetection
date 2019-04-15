@@ -82,10 +82,10 @@ images_train,images_test,labels_train, labels_test = train_test_split(
         test_size = PARTITION_TEST)
 
 
-def train_fn(images_train, labels_train):
+def train_fn(images_train, labels_train, epoch):
     ds_train = tf.data.Dataset.from_tensor_slices((images_train, labels_train))
     ds_train = ds_train.apply(tf.data.experimental.map_and_batch(load_and_preprocess_from_path_label, BATCH_SIZE))
-    ds_train = ds_train.repeat()
+    ds_train = ds_train.repeat(epoch)
     ds_train.prefetch(tf.contrib.data.AUTOTUNE)
     iterator = ds_train.make_one_shot_iterator()
     features, labels = iterator.get_next()
@@ -157,10 +157,10 @@ steps = math.ceil(len(labels_train)/BATCH_SIZE)
 
 
 train_spec = tf.estimator.TrainSpec(
-    input_fn=lambda: train_fn(images_train, labels_train),
+    input_fn=lambda: train_fn(images_train, labels_train, steps),
     max_steps=steps)
 eval_spec = tf.estimator.EvalSpec(
-    input_fn=lambda: train_fn(images_test, labels_test),
+    input_fn=lambda: train_fn(images_test, labels_test, len(labels_test)/BATCH_SIZE/2),
     steps=len(labels_test)/BATCH_SIZE/2,
     start_delay_secs=0)
      
