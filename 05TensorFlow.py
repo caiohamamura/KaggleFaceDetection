@@ -153,7 +153,7 @@ cifar_est = tf.keras.estimator.model_to_estimator(keras_model=model
     ,model_dir="kkt"
 )
 
-steps = range(math.ceil(len(labels_train)/BATCH_SIZE))
+steps = math.ceil(len(labels_train)/BATCH_SIZE)
 
 
 train_spec = tf.estimator.TrainSpec(
