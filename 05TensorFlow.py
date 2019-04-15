@@ -154,6 +154,25 @@ cifar_est = tf.keras.estimator.model_to_estimator(keras_model=model
 )
 
 steps = range(math.ceil(len(labels_train)/BATCH_SIZE))
-for i in steps:
-    cifar_est.train(input_fn=lambda: train_fn(images_train, labels_train), steps=1)
-    cifar_est.test(input_fn=lambda: train_fn(images_test, labels_test), steps=len(labels_test)/BATCH_SIZE/2)
+
+
+train_spec = tf.estimator.TrainSpec(
+    input_fn=lambda: train_fn(images_train, labels_train),
+    max_steps=steps)
+eval_spec = tf.estimator.EvalSpec(
+    input_fn=lambda: train_fn(images_test, labels_test),
+    steps=len(labels_test)/BATCH_SIZE/2,
+    start_delay_secs=0)
+     
+  # run !
+  tf.estimator.train_and_evaluate(
+    cifar_est,
+    train_spec,
+    eval_spec
+  )
+
+
+# steps = range(math.ceil(len(labels_train)/BATCH_SIZE))
+# for i in steps:
+#     cifar_est.train(input_fn=lambda: train_fn(images_train, labels_train), steps=1)
+#     cifar_est.test(input_fn=lambda: train_fn(images_test, labels_test), steps=len(labels_test)/BATCH_SIZE/2)
