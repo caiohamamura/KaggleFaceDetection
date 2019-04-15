@@ -165,7 +165,7 @@ eval_spec = tf.estimator.EvalSpec(
     start_delay_secs=0)
      
   # run !
-  tf.estimator.train_and_evaluate(
+tf.estimator.train_and_evaluate(
     cifar_est,
     train_spec,
     eval_spec
