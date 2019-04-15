@@ -34,8 +34,11 @@ def gather_jobs_with_mpi():
     ranks = recvbuf2
 
     # Junta os host name dos nos com a porta 222 mais o identificador da tarefa
-    jobs = {'worker': ['%s:222%s' % (i, j) for (i,j) in zip(hosts, ranks) if j != 0]}
+    jobs = {'worker': ['%s:222%s' % (i, j) for (i,j) in zip(hosts, ranks) if j > 1]}
     jobs['ps'] = ['%s:2220' % (hosts[0])]
+    jobs['chief'] = ['%s:2221' % (hosts[1])]
+    
+
 
     return jobs
 
